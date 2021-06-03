@@ -96,7 +96,7 @@ def identify_blue(imag):
     filtered_b = cv2.medianBlur(b_channel, 5)
 
     # create a blue gray space
-    filtered_b = -0.5 * filtered_r + 4 * filtered_b - 0.5 * filtered_g
+    filtered_b = -0.5 * filtered_r + 4 * filtered_b - 2.5 * filtered_g
 
     blank = np.uint8(filtered_b)
 
@@ -245,18 +245,18 @@ while True:
             found = True
             break
 
-    x, y, w, h = cv2.boundingRect(candidates[0])
-    r = w / 2
-    a = cv2.contourArea(candidates[0])
+    # x, y, w, h = cv2.boundingRect(candidates[0])
+    # r = w / 2
+    # a = cv2.contourArea(candidates[0])
 
-    # cv2.drawContours(img, [candidates[2]], 0,
-    #                  (0, 255, 0), thickness=cv2.FILLED)
+    # # cv2.drawContours(img, [candidates[2]], 0,
+    # #                  (0, 255, 0), thickness=cv2.FILLED)
 
-    aa = math.pi * r * r
-    aspect_ratio = w / h
-    print(aspect_ratio, w, h, a, aa, w * h)
-    cv2.rectangle(img, (x, y), (int(x + w),
-                                int(y + h)), (0, 255, 0), 2)
+    # aa = math.pi * r * r
+    # aspect_ratio = w / h
+    # print(aspect_ratio, w, h, a, aa, w * h)
+    # cv2.rectangle(img, (x, y), (int(x + w),
+    #                             int(y + h)), (0, 255, 0), 2)
 
     if not found:
         print("No traffic sign found!")
