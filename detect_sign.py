@@ -3,6 +3,8 @@ import numpy as np
 import imutils
 import math
 import functools
+import matplotlib.pyplot as plt
+import os
 
 
 def identify_red(imag):
@@ -214,9 +216,7 @@ def contourComparator(c1, c2):
         return a1 - a2
 
 
-while True:
-    img = cv2.imread('test_images/blue_1.jpg')
-
+def detect_sign(img):
     red_list = identify_red(img)
     blue_list = identify_blue(img)
     yellow_list = identify_yellow(img)
@@ -229,38 +229,66 @@ while True:
     candidates = sorted(
         candidates, key=cv2.contourArea, reverse=True)
 
-    found = False
-
     # Check if aspect ratio match
-    min_aspect_ratio = 0.9
-    max_aspect_ratio = 1.1
+    min_aspect_ratio = 0.8
+    max_aspect_ratio = 1.2
 
     for c in candidates:
         x, y, w, h = cv2.boundingRect(c)
         aspect_ratio = w / h
-
         if aspect_ratio >= min_aspect_ratio and aspect_ratio <= max_aspect_ratio:
-            cv2.rectangle(img, (x, y), (int(x + w),
-                                        int(y + h)), (0, 255, 0), 2)
-            found = True
+            return x, y, w, h
             break
+    
+    return None, None, None, None
 
-    # x, y, w, h = cv2.boundingRect(candidates[0])
-    # r = w / 2
-    # a = cv2.contourArea(candidates[0])
+# while True:
+#     img = cv2.imread('test_images/blue_1.jpg')
 
-    # # cv2.drawContours(img, [candidates[2]], 0,
-    # #                  (0, 255, 0), thickness=cv2.FILLED)
+#     red_list = identify_red(img)
+#     blue_list = identify_blue(img)
+#     yellow_list = identify_yellow(img)
 
-    # aa = math.pi * r * r
-    # aspect_ratio = w / h
-    # print(aspect_ratio, w, h, a, aa, w * h)
-    # cv2.rectangle(img, (x, y), (int(x + w),
-    #                             int(y + h)), (0, 255, 0), 2)
+#     candidates = red_list + blue_list + yellow_list
 
-    if not found:
-        print("No traffic sign found!")
+#     # candidates = sorted(
+#     #     candidates, key=functools.cmp_to_key(contourComparator), reverse=True)
 
-    cv2.imshow("Result", img)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+#     candidates = sorted(
+#         candidates, key=cv2.contourArea, reverse=True)
+
+#     found = False
+
+#     # Check if aspect ratio match
+#     min_aspect_ratio = 0.9
+#     max_aspect_ratio = 1.1
+
+#     for c in candidates:
+#         x, y, w, h = cv2.boundingRect(c)
+#         aspect_ratio = w / h
+
+#         if aspect_ratio >= min_aspect_ratio and aspect_ratio <= max_aspect_ratio:
+#             cv2.rectangle(img, (x, y), (int(x + w),
+#                                         int(y + h)), (0, 255, 0), 2)
+#             found = True
+#             break
+
+#     # x, y, w, h = cv2.boundingRect(candidates[0])
+#     # r = w / 2
+#     # a = cv2.contourArea(candidates[0])
+
+#     # # cv2.drawContours(img, [candidates[2]], 0,
+#     # #                  (0, 255, 0), thickness=cv2.FILLED)
+
+#     # aa = math.pi * r * r
+#     # aspect_ratio = w / h
+#     # print(aspect_ratio, w, h, a, aa, w * h)
+#     # cv2.rectangle(img, (x, y), (int(x + w),
+#     #                             int(y + h)), (0, 255, 0), 2)
+
+#     if not found:
+#         print("No traffic sign found!")
+
+#     cv2.imshow("Result", img)
+#     if cv2.waitKey(1) & 0xFF == ord('q'):
+#         break
