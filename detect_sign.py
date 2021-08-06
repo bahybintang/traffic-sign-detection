@@ -162,7 +162,7 @@ def identify_yellow(imag):
     filtered_b = cv2.medianBlur(b_channel, 5)
 
     # create a yellow gray space
-    filtered_b = 3 * filtered_r - 0.5 * filtered_b + 5 * filtered_g
+    filtered_b = 3 * filtered_r + 3 * filtered_g
 
     blank = np.uint8(filtered_b)
 
@@ -173,7 +173,7 @@ def identify_yellow(imag):
     dilation = cv2.dilate(erosion, kernel_2, iterations=1)
     opening = cv2.morphologyEx(dilation, cv2.MORPH_OPEN, kernel_2)
 
-    _, b_thresh = cv2.threshold(opening, 40, 255, cv2.THRESH_BINARY)
+    _, b_thresh = cv2.threshold(opening, 30, 255, cv2.THRESH_BINARY)
 
     cnts = cv2.findContours(b_thresh, cv2.RETR_EXTERNAL,
                             cv2.CHAIN_APPROX_SIMPLE)
@@ -246,8 +246,8 @@ def detect_sign(img, is_yolo=False, category=False):
         candidates, key=cv2.contourArea, reverse=True)
 
     # Check if aspect ratio match
-    min_aspect_ratio = 0.75
-    max_aspect_ratio = 1.5
+    min_aspect_ratio = 0.5
+    max_aspect_ratio = 2
 
     for c in candidates:
         x, y, w, h = cv2.boundingRect(c)
