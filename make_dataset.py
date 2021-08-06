@@ -6,6 +6,21 @@ from detect_sign import *
 dataset_path = './yogyakarta_dataset/Survei rambu'
 out_dir = './yogyakarta_processed_dataset'
 
+CATEGORY_PERINGATAN = 1
+CATEGORY_LARANGAN = 2
+CATEGORY_PERINTAH = 3
+
+
+def category_check(path):
+    global CATEGORY_PERINGATAN, CATEGORY_LARANGAN, CATEGORY_PERINTAH
+    if "1. Rambu Peringatan" in path:
+        return CATEGORY_PERINGATAN
+    elif "2. Rambu Larangan" in path:
+        return CATEGORY_LARANGAN
+    elif "3. Rambu Perintah" in path:
+        return CATEGORY_PERINTAH
+    return False
+
 
 def move_image_rename_and_get_classes(dir):
     paths = []
@@ -14,9 +29,17 @@ def move_image_rename_and_get_classes(dir):
     cnt = 1
     for dirpath, dirnames, filenames in os.walk(dir):
         for filename in [f for f in filenames if f.endswith(".jpg")]:
-            print("No of images:", cnt)
+            print("No of images:", cnt, end=' ')
             cnt = cnt + 1
             path = os.path.join(dirpath, filename)
+
+            category = category_check(path)
+            if category:
+                print('(Valid Category)')
+            else:
+                print('Invalid Category')
+                continue
+
             image_class = " ".join(path.split('/')[-2].split()[1:])
 
             # paths.append(path)
@@ -28,7 +51,8 @@ def move_image_rename_and_get_classes(dir):
             image_class_code = classes.index(image_class)
 
             # Make boundary file
-            boundary = detect_sign_by_path(path, is_yolo=True)
+            boundary = detect_sign_by_path(
+                path, is_yolo=True, category=category)
             if boundary[0] is not None:
                 f = open(os.path.join(out_dir, "{}_{}.txt".format(
                     image_class_code, filename.split('.')[0])), 'w')

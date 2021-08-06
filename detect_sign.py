@@ -6,6 +6,10 @@ import functools
 import matplotlib.pyplot as plt
 import os
 
+CATEGORY_PERINGATAN = 1
+CATEGORY_LARANGAN = 2
+CATEGORY_PERINTAH = 3
+
 
 def identify_red(imag):
     img = imag.copy()
@@ -140,11 +144,12 @@ def identify_yellow(imag):
     # convert the image to HSV format for color segmentation
     img_hsv = cv2.cvtColor(imag, cv2.COLOR_BGR2HSV)
 
-    # mask to extract blue
-    lower_yellow = np.array([15, 100, 100])
+    # mask to extract yellow
+    lower_yellow = np.array([10, 100, 100])
     upper_yellow = np.array([40, 255, 255])
     mask = cv2.inRange(img_hsv, lower_yellow, upper_yellow)
-    yellow_mask = cv2.bitwise_or(img_hsv, img_hsv, mask=mask)
+
+    yellow_mask = cv2.bitwise_or(img_output, img_output, mask=mask)
 
     # seperate out the channels
     r_channel = yellow_mask[:, :, 2]
@@ -168,7 +173,7 @@ def identify_yellow(imag):
     dilation = cv2.dilate(erosion, kernel_2, iterations=1)
     opening = cv2.morphologyEx(dilation, cv2.MORPH_OPEN, kernel_2)
 
-    _, b_thresh = cv2.threshold(opening, 50, 255, cv2.THRESH_BINARY)
+    _, b_thresh = cv2.threshold(opening, 40, 255, cv2.THRESH_BINARY)
 
     cnts = cv2.findContours(b_thresh, cv2.RETR_EXTERNAL,
                             cv2.CHAIN_APPROX_SIMPLE)
@@ -216,14 +221,23 @@ def contourComparator(c1, c2):
         return a1 - a2
 
 
-def detect_sign(img, is_yolo=False):
+def detect_sign(img, is_yolo=False, category=False):
+    global CATEGORY_PERINGATAN, CATEGORY_LARANGAN, CATEGORY_PERINTAH
+
     img_height, img_width, _ = img.shape
 
     red_list = identify_red(img)
     blue_list = identify_blue(img)
     yellow_list = identify_yellow(img)
 
-    candidates = red_list + blue_list + yellow_list
+    if not category:
+        candidates = red_list + blue_list + yellow_list
+    elif category == CATEGORY_PERINGATAN:
+        candidates = yellow_list
+    elif category == CATEGORY_LARANGAN:
+        candidates = red_list
+    elif category == CATEGORY_PERINTAH:
+        candidates = blue_list
 
     # candidates = sorted(
     #     candidates, key=functools.cmp_to_key(contourComparator), reverse=True)
@@ -247,8 +261,8 @@ def detect_sign(img, is_yolo=False):
     return None, None, None, None
 
 
-def detect_sign_by_path(path, is_yolo=False):
-    return detect_sign(cv2.imread(path), is_yolo)
+def detect_sign_by_path(path, is_yolo=False, category=False):
+    return detect_sign(cv2.imread(path), is_yolo, category)
 
 # while True:
 #     img = cv2.imread('test_images/blue_1.jpg')
