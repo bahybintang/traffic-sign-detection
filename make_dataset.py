@@ -26,6 +26,7 @@ def move_image_rename_and_get_classes(dir):
     paths = []
     boundary = []
     classes = []
+    counts = []
     cnt = 1
     for dirpath, dirnames, filenames in os.walk(dir):
         for filename in [f for f in filenames if f.endswith(".jpg")]:
@@ -35,7 +36,7 @@ def move_image_rename_and_get_classes(dir):
 
             category = category_check(path)
             if category:
-                print('(Valid Category)')
+                print('(Category {})'.format(category))
             else:
                 print('Invalid Category')
                 continue
@@ -47,8 +48,10 @@ def move_image_rename_and_get_classes(dir):
 
             if image_class not in classes:
                 classes.append(image_class)
+                counts.append(0)
 
             image_class_code = classes.index(image_class)
+            counts[image_class_code] = counts[image_class_code] + 1
 
             # Make boundary file
             boundary = detect_sign_by_path(
@@ -64,22 +67,26 @@ def move_image_rename_and_get_classes(dir):
             os.system("cp {} {}".format(path.replace(' ', '\\ '), os.path.join(out_dir, "{}_{}".format(
                 image_class_code, filename))))
 
-            if cnt == 100:
-                return paths, boundary, classes
+            if cnt == 30:
+                return paths, boundary, classes, counts
 
-    return paths, boundary, classes
+    return paths, boundary, classes, counts
 
 
-paths, boundary, classes = move_image_rename_and_get_classes(dataset_path)
+paths, boundary, classes, counts = move_image_rename_and_get_classes(
+    dataset_path)
 
 f_classes = open(os.path.join(out_dir, "classes.txt"), 'w')
+f_counts = open(os.path.join(out_dir, "counts.txt"), 'w')
 # f_paths = open(os.path.join(out_dir, "paths.txt"), 'w')
 # f_boundary = open(os.path.join(out_dir, "boundary.txt"), 'w')
 
 f_classes.write("\n".join(classes))
+f_counts.write("\n".join([str(i) for i in counts]))
 # f_paths.write(str(paths))
 # f_boundary.write(str(boundary))
 
 f_classes.close()
+f_counts.close()
 # f_paths.close()
 # f_boundary.close()
