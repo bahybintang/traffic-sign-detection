@@ -216,7 +216,9 @@ def contourComparator(c1, c2):
         return a1 - a2
 
 
-def detect_sign(img):
+def detect_sign(img, is_yolo=False):
+    img_height, img_width, _ = img.shape
+
     red_list = identify_red(img)
     blue_list = identify_blue(img)
     yellow_list = identify_yellow(img)
@@ -237,10 +239,16 @@ def detect_sign(img):
         x, y, w, h = cv2.boundingRect(c)
         aspect_ratio = w / h
         if aspect_ratio >= min_aspect_ratio and aspect_ratio <= max_aspect_ratio:
-            return x, y, w, h
-            break
-    
+            if is_yolo:
+                return x / img_width, y / img_height, w / img_width, h / img_height
+            else:
+                return x, y, w, h
+
     return None, None, None, None
+
+
+def detect_sign_by_path(path, is_yolo=False):
+    return detect_sign(cv2.imread(path), is_yolo)
 
 # while True:
 #     img = cv2.imread('test_images/blue_1.jpg')
