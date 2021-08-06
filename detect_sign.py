@@ -232,15 +232,15 @@ def detect_sign(img, is_yolo=False):
         candidates, key=cv2.contourArea, reverse=True)
 
     # Check if aspect ratio match
-    min_aspect_ratio = 0.8
-    max_aspect_ratio = 1.2
+    min_aspect_ratio = 0.75
+    max_aspect_ratio = 1.5
 
     for c in candidates:
         x, y, w, h = cv2.boundingRect(c)
         aspect_ratio = w / h
         if aspect_ratio >= min_aspect_ratio and aspect_ratio <= max_aspect_ratio:
             if is_yolo:
-                return x / img_width, y / img_height, w / img_width, h / img_height
+                return (x + w/2.0) / img_width, (y + h/2.0) / img_height, w / img_width, h / img_height
             else:
                 return x, y, w, h
 
