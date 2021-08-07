@@ -67,8 +67,8 @@ def move_image_rename_and_get_classes(dir):
             os.system("cp {} {}".format(path.replace(' ', '\\ '), os.path.join(out_dir, "{}_{}".format(
                 image_class_code, filename))))
 
-            if cnt == 30:
-                return paths, boundary, classes, counts
+            # if cnt == 30:
+            #     return paths, boundary, classes, counts
 
     return paths, boundary, classes, counts
 
