@@ -28,10 +28,17 @@ def move_image_rename_and_get_classes(dir):
     classes = []
     counts = []
     cnt = 1
+
+    # skip = 219
+
     for dirpath, dirnames, filenames in os.walk(dir):
         for filename in [f for f in filenames if f.endswith(".jpg")]:
             print("No of images:", cnt, end=' ')
             cnt = cnt + 1
+
+            # if cnt <= skip:
+            #     continue
+
             path = os.path.join(dirpath, filename)
 
             category = category_check(path)
@@ -64,8 +71,10 @@ def move_image_rename_and_get_classes(dir):
                 f.close()
 
             # Copy image and rename
-            os.system("cp {} {}".format(path.replace(' ', '\\ '), os.path.join(out_dir, "{}_{}".format(
-                image_class_code, filename))))
+            command = "cp {} {}".format(path.replace(' ', '\\ ').replace('(', '\\(').replace(')', '\\)'), os.path.join(out_dir, "{}_{}".format(
+                image_class_code, filename)))
+            # print(command)
+            os.system(command)
 
             # if cnt == 30:
             #     return paths, boundary, classes, counts
